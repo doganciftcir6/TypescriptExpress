@@ -2,6 +2,8 @@ import express, {Request,Response} from "express"
 
 //uygulama oluştur
 const app = express();
+//port
+const port = 4000;
 
 //router oluştur
 const router = express.Router();
@@ -26,6 +28,6 @@ router.post("/user", (req:Request, res:Response) => {
 
 app.use("/", router);
 //serveri dinle
-app.listen(3001, () => {
-    console.log("3001");
+app.listen(port, () => {
+    console.log("4000 is running..");
 });
