@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon app/index.ts",
-    "buikd": "tsc"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",

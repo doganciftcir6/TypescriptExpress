@@ -1,5 +1,6 @@
 {
     //Compiler ayarlarını yapılandıracağız.
+    //Çıktı ES5 formatında /dist klasörü altında olacak.
     "compilerOptions": {
         "target": "ES5",
         "module": "CommonJS",
