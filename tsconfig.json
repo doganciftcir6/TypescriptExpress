@@ -5,7 +5,8 @@
         "target": "ES5",
         "module": "CommonJS",
         "outDir": "./dist",
-        "rootDir": "./app",
+        //uygulamanın tüm dosyaları rootDir de belirtilen konumda olmalı, import export sırasında hata çıkabilir.
+        "rootDir": "./",
         "strict": true,
         "skipDefaultLibCheck": true,
         "esModuleInterop": true,
