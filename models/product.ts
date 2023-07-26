@@ -1,14 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../helpers/dbhelpers/connection";
 import Category from './category';
-
-interface IProduct {
-  id?: number;
-  name: string;
-  description: string;
-  price: number;
-  status: boolean;
-}
+import IProduct from "./interfaces/productinterface";
 
 class Product extends Model<IProduct> implements IProduct {
   public id!: number;
