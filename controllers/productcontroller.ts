@@ -2,13 +2,13 @@ import { Request, Response } from "express";
 import Product from "../models/product";
 
 //GetAllProduct
-export const getAllProducts = async (req: Request, res: Response) => {
+const getAllProducts = async (req: Request, res: Response) => {
   const products = await Product.findAll();
   return res.status(200).json(products);
 };
 
 //GetByIdProduct
-export const getProductById = async (req: Request, res: Response) => {
+const getProductById = async (req: Request, res: Response) => {
   //id parametreden gelecek
   const { id } = req.params;
   const product = await Product.findByPk(id);
@@ -20,7 +20,7 @@ export const getProductById = async (req: Request, res: Response) => {
 };
 
 //InsertProduct
-export const insertProduct = async (req: Request, res: Response) => {
+const insertProduct = async (req: Request, res: Response) => {
   const { name, description, price, status } = req.body;
 
   await Product.create({
@@ -38,7 +38,7 @@ export const insertProduct = async (req: Request, res: Response) => {
 };
 
 //UpdateProduct
-export const updateProduct = async (req: Request, res: Response) => {
+const updateProduct = async (req: Request, res: Response) => {
   //id bodyden gelecek önce bu idli kayıt db de var mı kontrol.
   const updatedProduct = req.body;
   const oldProduct = await Product.findByPk(updatedProduct.id);
@@ -56,7 +56,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 };
 
 //DeleteProduct
-export const deleteProduct = async (req: Request, res: Response) => {
+const deleteProduct = async (req: Request, res: Response) => {
   //id parametreden gelecek
   const { id } = req.params;
   //bu idye sahip kayıt db de var mı kontrol
@@ -66,4 +66,12 @@ export const deleteProduct = async (req: Request, res: Response) => {
   Product.destroy({ where: { id } }).then(() =>
     res.status(200).json(`${id} Product with ID successfully deleted.`)
   );
+};
+
+export default {
+  getAllProducts,
+  getProductById,
+  insertProduct,
+  updateProduct,
+  deleteProduct,
 };
