@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../helpers/dbhelpers/connection";
-import ICategory from "./interfaces/categoryinterface";
+import ICategory from "./interfaces/categoryInterface";
 
 class Category extends Model<ICategory> implements ICategory {
   id!: number;

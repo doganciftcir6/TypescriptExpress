@@ -3,20 +3,27 @@ import Product from "../models/product";
 
 //GetAllProduct
 const getAllProducts = async (req: Request, res: Response) => {
-  const products = await Product.findAll();
-  return res.status(200).json(products);
+  await Product.findAll()
+    .then((products) => {
+      res.status(200).json(products);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
 };
 
 //GetByIdProduct
 const getProductById = async (req: Request, res: Response) => {
   //id parametreden gelecek
   const { id } = req.params;
-  const product = await Product.findByPk(id);
-  if (!product) {
-    return res.status(404).json({ message: "Product is not found." });
-  }
 
-  return res.status(200).json(product);
+  await Product.findByPk(id).catch((product) => {
+    if (!product) {
+      return res.status(404).json({ message: "Product is not found." });
+    }
+    //kayıt dbde mevcut
+    res.status(200).json(product);
+  });
 };
 
 //InsertProduct
@@ -29,8 +36,8 @@ const insertProduct = async (req: Request, res: Response) => {
     price,
     status,
   })
-    .then((product) => {
-      res.status(200).json(product);
+    .then((newProduct) => {
+      res.status(200).json(newProduct);
     })
     .catch((err) => {
       res.status(500).json(err);
@@ -50,7 +57,7 @@ const updateProduct = async (req: Request, res: Response) => {
     .then(() =>
       res
         .status(200)
-        .json(`${updatedProduct.id} product with ID successfully updated.`)
+        .json(`${updatedProduct.id} Product with ID successfully updated.`)
     )
     .catch((err) => res.status(500).json(err));
 };
@@ -60,12 +67,12 @@ const deleteProduct = async (req: Request, res: Response) => {
   //id parametreden gelecek
   const { id } = req.params;
   //bu idye sahip kayıt db de var mı kontrol
-  const oldProduct = Product.findByPk(id);
+  const oldProduct = await Product.findByPk(id);
   if (!oldProduct) return res.status(404).json("Product is not found.");
   //kayıt var silme işlemi
-  Product.destroy({ where: { id } }).then(() =>
+  await Product.destroy({ where: { id } }).then(() =>
     res.status(200).json(`${id} Product with ID successfully deleted.`)
-  );
+  ).catch((err) => res.status(500).json(err));
 };
 
 export default {

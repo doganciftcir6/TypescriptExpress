@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../helpers/dbhelpers/connection";
 import bcrypt from "bcrypt";
-import IAppUser from "./interfaces/userinterface";
+import IAppUser from "./interfaces/userInterface";
 
 class AppUser extends Model<IAppUser> implements IAppUser{
     public id!: number;
