@@ -8,7 +8,7 @@ const getAllProducts = async (req: Request, res: Response) => {
       res.status(200).json(products);
     })
     .catch((err) => {
-      res.status(500).json(err);
+      res.status(500).json({ message: `${err}` });
     });
 };
 
@@ -17,13 +17,17 @@ const getProductById = async (req: Request, res: Response) => {
   //id parametreden gelecek
   const { id } = req.params;
 
-  await Product.findByPk(id).catch((product) => {
-    if (!product) {
-      return res.status(404).json({ message: "Product is not found." });
-    }
-    //kayıt dbde mevcut
-    res.status(200).json(product);
-  });
+  await Product.findByPk(id)
+    .then((product) => {
+      if (!product) {
+        return res.status(404).json({ message: "Product is not found." });
+      }
+      //kayıt dbde mevcut
+      res.status(200).json(product);
+    })
+    .catch((err) => {
+      res.status(500).json({ message: `${err}` });
+    });
 };
 
 //InsertProduct
@@ -37,10 +41,12 @@ const insertProduct = async (req: Request, res: Response) => {
     status,
   })
     .then((newProduct) => {
-      res.status(200).json(newProduct);
+      res.status(200).json({
+        message: `${newProduct.id} Product with ID successfully added.`,
+      });
     })
     .catch((err) => {
-      res.status(500).json(err);
+      res.status(500).json({ message: `${err}` });
     });
 };
 
@@ -50,16 +56,18 @@ const updateProduct = async (req: Request, res: Response) => {
   const updatedProduct = req.body;
   const oldProduct = await Product.findByPk(updatedProduct.id);
   if (!oldProduct) {
-    return res.status(404).json("Product is not found.");
+    return res.status(404).json({ message: "Product is not found." });
   }
   //kayıt var update yapılır
   await Product.update(updatedProduct, { where: { id: updatedProduct.id } })
     .then(() =>
       res
         .status(200)
-        .json(`${updatedProduct.id} Product with ID successfully updated.`)
+        .json({
+          message: `${updatedProduct.id} Product with ID successfully updated.`,
+        })
     )
-    .catch((err) => res.status(500).json(err));
+    .catch((err) => res.status(500).json({ message: `${err}` }));
 };
 
 //DeleteProduct
@@ -68,11 +76,16 @@ const deleteProduct = async (req: Request, res: Response) => {
   const { id } = req.params;
   //bu idye sahip kayıt db de var mı kontrol
   const oldProduct = await Product.findByPk(id);
-  if (!oldProduct) return res.status(404).json("Product is not found.");
+  if (!oldProduct)
+    return res.status(404).json({ message: "Product is not found." });
   //kayıt var silme işlemi
-  await Product.destroy({ where: { id } }).then(() =>
-    res.status(200).json(`${id} Product with ID successfully deleted.`)
-  ).catch((err) => res.status(500).json(err));
+  await Product.destroy({ where: { id } })
+    .then(() =>
+      res
+        .status(200)
+        .json({ message: `${id} Product with ID successfully deleted.` })
+    )
+    .catch((err) => res.status(500).json({ message: `${err}` }));
 };
 
 export default {

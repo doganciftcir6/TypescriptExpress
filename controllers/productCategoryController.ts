@@ -10,11 +10,11 @@ const getAllProductCategories = async (req: Request, res: Response) => {
     include: [
       {
         model: Product,
-        attributes: ["id", "name", "price"], // Sadece id, name ve price alanlarını döndür
+        attributes: ["id", "name", "price"], // sadece id, name ve price alanlarını döndür
       },
       {
         model: Category,
-        attributes: ["id", "name"], // Sadece id ve name alanlarını döndür
+        attributes: ["id", "name"], // sadece id ve name alanlarını döndür
       },
     ],
   })
@@ -68,7 +68,11 @@ const insertProductCategory = async (req: Request, res: Response) => {
     categoryId,
   })
     .then((newProductCategory) => {
-      res.status(200).json(newProductCategory);
+      res
+        .status(200)
+        .json({
+          message: `${newProductCategory.id} ProductCategory with ID successfully added.`,
+        });
     })
     .catch((err) => res.status(500).json({ message: `${err}` }));
 };
@@ -114,15 +118,17 @@ const deleteProductCategory = async (req: Request, res: Response) => {
     .then(() => {
       res
         .status(200)
-        .json({ message: `${id} ProductCategory with ID successfully deleted.` });
+        .json({
+          message: `${id} ProductCategory with ID successfully deleted.`,
+        });
     })
     .catch((err) => res.status(500).json({ message: `${err}` }));
 };
 
 export default {
-    getAllProductCategories,
-    getProductCategoryById,
-    insertProductCategory,
-    updateProductCategory,
-    deleteProductCategory,
+  getAllProductCategories,
+  getProductCategoryById,
+  insertProductCategory,
+  updateProductCategory,
+  deleteProductCategory,
 };

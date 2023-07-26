@@ -8,7 +8,7 @@ const getAllCategories = async (req: Request, res: Response) => {
       res.status(200).json(categories);
     })
     .catch((err) => {
-      res.status(500).json(err);
+      res.status(500).json({ message: `${err}` });
     });
 };
 
@@ -26,7 +26,7 @@ const getCategoryById = async (req: Request, res: Response) => {
       res.status(200).json(category);
     })
     .catch((err) => {
-      res.status(500).json(err);
+      res.status(500).json({ message: `${err}` });
     });
 };
 
@@ -39,10 +39,14 @@ const insertCategory = async (req: Request, res: Response) => {
     status,
   })
     .then((newCategory) => {
-      res.status(200).json(newCategory);
+      res
+        .status(200)
+        .json({
+          message: `${newCategory.id} Category with ID successfully added.`,
+        });
     })
     .catch((err) => {
-      res.status(500).json(err);
+      res.status(500).json({ message: `${err}` });
     });
 };
 
@@ -52,16 +56,18 @@ const updateCatgory = async (req: Request, res: Response) => {
   const updatedCategory = req.body;
   const oldCategory = await Category.findByPk(updatedCategory.id);
   if (!oldCategory) {
-    return res.status(404).json("Category is not found.");
+    return res.status(404).json({ message: "Category is not found." });
   }
   //kayıt var update yapılır
   await Category.update(updatedCategory, { where: { id: updatedCategory.id } })
     .then(() => {
       res
         .status(200)
-        .json(`${updatedCategory.id} Category with ID successfully updated.`);
+        .json({
+          message: `${updatedCategory.id} Category with ID successfully updated.`,
+        });
     })
-    .catch((err) => res.status(500).json(err));
+    .catch((err) => res.status(500).json({ message: `${err}` }));
 };
 
 //DeleteCategory
@@ -71,14 +77,16 @@ const deleteCategory = async (req: Request, res: Response) => {
   //bu idye sahip kayıt db de var mı kontrol
   const oldCategory = await Category.findByPk(id);
   if (!oldCategory) {
-    return res.status(404).json("Category is not found.");
+    return res.status(404).json({ message: "Category is not found." });
   }
   //kayıt var silme işlemi
   await Category.destroy({ where: { id } })
     .then(() => {
-      res.status(200).json(`${id} Category with ID successfully deleted.`);
+      res
+        .status(200)
+        .json({ message: `${id} Category with ID successfully deleted.` });
     })
-    .catch((err) => res.status(500).json(err));
+    .catch((err) => res.status(500).json({ message: `${err}` }));
 };
 
 export default {
