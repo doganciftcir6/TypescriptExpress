@@ -5,4 +5,4 @@ interface IAppUser {
   password: string;
 }
 
-export default IAppUser
+export default IAppUser;

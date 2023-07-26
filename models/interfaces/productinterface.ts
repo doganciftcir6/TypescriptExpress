@@ -6,4 +6,4 @@ interface IProduct {
   status: boolean;
 }
 
-export default IProduct
+export default IProduct;

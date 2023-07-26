@@ -4,4 +4,4 @@ interface ICategory {
   status: boolean;
 }
 
-export default ICategory
+export default ICategory;
