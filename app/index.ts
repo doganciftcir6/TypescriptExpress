@@ -1,33 +1,34 @@
-import express, {Request,Response} from "express"
+import express, { Request, Response } from "express";
+import db from "../helpers/dbhelpers/connection";
+import cors from "cors";
+import appUserRoutes from "../routes/appUserRoutes";
+import categoryRoutes from "../routes/categoryRoutes";
+import productRoutes from "../routes/productRoutes";
+import productCategoryRoutes from "../routes/productCategoryRoutes";
 
 //uygulama oluştur
 const app = express();
+
 //port
 const port = 4000;
 
-//router oluştur
-const router = express.Router();
+//db bağlantısı başarılıysa serveri dinle
+db.authenticate()
+  .then(() => {
+    app.listen(port, () => {
+      console.log("4000 is running and db connection is success..");
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
-//fake data interfacei
-interface User{
-    id: string
-    ad: string
-    soyad: string
-}
+//middleware
+app.use(cors()); // CORS izinleri için
+app.use(express.json()); //kullanıcının isteğin bodysinden gönderdiği bilgileri okumak için
 
 //route
-router.get("/user", (req:Request, res:Response) => {
-    //fake datayı doldur ve response olarak gönder
-    const arr:User[] = [{ad:"Ali", id:"1", soyad:"Uçar"}, {ad:"Ayşe", id:"2", soyad:"Uçar"}];
-    res.status(200).json(arr); 
-});
-router.post("/user", (req:Request, res:Response) => {
-    const obj:User = {ad:"Yasin", soyad:"Dalkılıç", id:"5"};
-    res.status(201).json(obj);
-});
-
-app.use("/", router);
-//serveri dinle
-app.listen(port, () => {
-    console.log("4000 is running..");
-});
+app.use("/api/appusers", appUserRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/productCategories", productCategoryRoutes);
