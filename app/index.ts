@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import db from "../helpers/dbhelpers/connection";
 import cors from "cors";
+import dotenv from "dotenv";
 import appUserRoutes from "../routes/appUserRoutes";
 import categoryRoutes from "../routes/categoryRoutes";
 import productRoutes from "../routes/productRoutes";
@@ -9,14 +10,16 @@ import productCategoryRoutes from "../routes/productCategoryRoutes";
 //uygulama oluştur
 const app = express();
 
-//port
-const port = 4000;
+//env kullan
+dotenv.config();
 
 //db bağlantısı başarılıysa serveri dinle
 db.authenticate()
   .then(() => {
-    app.listen(port, () => {
-      console.log("4000 is running and db connection is success..");
+    app.listen(process.env.PORT, () => {
+      console.log(
+        "The server is running, and the database connection is successful.."
+      );
     });
   })
   .catch((err) => {
