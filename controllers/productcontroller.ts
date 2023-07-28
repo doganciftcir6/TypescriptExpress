@@ -4,7 +4,14 @@ import Category from "../models/category";
 
 //GetAllProduct
 const getAllProducts = async (req: Request, res: Response) => {
-  await Product.findAll({ include: [Category] })
+  await Product.findAll({
+    include: [
+      {
+        model: Category,
+        attributes: ["name", "status"], //sadece cateogry tablosundaki name ve status alanları gelsin.
+      },
+    ],
+  })
     .then((products) => {
       res.status(200).json(products);
     })
@@ -19,11 +26,12 @@ const getProductById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   await Product.findByPk(id, {
-    include: {
-      model: Category,
-      attributes: ["name", "status"],
-    },
-    attributes: ["id", "name", "price"],
+    include: [
+      {
+        model: Category,
+        attributes: ["name", "status"],
+      },
+    ],
   })
     .then((product) => {
       if (!product) {
@@ -48,48 +56,63 @@ const insertProduct = async (req: Request, res: Response) => {
     status,
   })
     .then((newProduct) => {
-      // Kategori ID verilmiş mi?
+      //categoryid var mı diye kontrol
       if (!categoryId) {
-        return res.status(400).json({ message: "Kategori ID gereklidir." });
+        return res
+          .status(400)
+          .json({ message: "Please enter the categoryId." });
       }
 
-      // Verilen kategori ID ile eşleşen bir kategori var mı?
+      //girilen categoryid'ye sahip kayıt category tablosunda var mı kontrolü
       return Category.findByPk(categoryId).then((category) => {
         if (!category) {
-          return res.status(404).json({ message: "Kategori bulunamadı." });
+          return res.status(404).json({ message: "Category is not found." });
         }
 
-        // Eşleşen kategori var ise, yeni ürün ile kategori arasında ilişki oluştur
+        //kategori dbde var, manytomany ilişki tablosuna bu categoryi ekle.
         return newProduct.$add("categories", category).then(() => {
-          // İşlem başarılıysa 201 Created cevabı dön
-          return res.status(201).json({ message: "Ürün başarıyla eklendi." });
+          return res.status(200).json({
+            message: `${newProduct.id} Product with ID successfully added.`,
+          });
         });
       });
     })
-    .catch((error) => {
-      // Hata durumunda 500 Internal Server Error dön
-      console.error("Hata oluştu:", error);
-      return res
-        .status(500)
-        .json({ message: "İşlem sırasında bir hata oluştu." });
+    .catch((err) => {
+      return res.status(500).json({ message: `${err}` });
     });
 };
 
 //UpdateProduct
 const updateProduct = async (req: Request, res: Response) => {
-  //id bodyden gelecek önce bu idli kayıt db de var mı kontrol.
+  //id isteğin bodysinden gelecek
   const updatedProduct = req.body;
+  //bu id ye sahip kayıt product tablosunda var mı kontrol
   const oldProduct = await Product.findByPk(updatedProduct.id);
   if (!oldProduct) {
     return res.status(404).json({ message: "Product is not found." });
   }
-  //kayıt var update yapılır
+
+  //kayıt var update işlemine geç
   await Product.update(updatedProduct, { where: { id: updatedProduct.id } })
-    .then(() =>
-      res.status(200).json({
-        message: `${updatedProduct.id} Product with ID successfully updated.`,
-      })
-    )
+    .then(async () => {
+      //kullanıcı update sırasınca categoryId değeri girmeli
+      if (!updatedProduct.categoryId) {
+        return res.status(400).json({ message: "Please enter the categoryId." });
+      }
+
+      //kullanıcının girdiği categoryId Category tablosunda varmı kontrol
+      const category = await Category.findByPk(updatedProduct.categoryId);
+      if (!category) {
+        return res.status(404).json({ message: "Category is not found." });
+      }
+
+      //eğer kayıt varsa many to many tablosunda ilgili category kaydını yenisiyle güncelle
+      return oldProduct.$set("categories", category).then(() => {
+        return res.status(200).json({
+          message: `${updatedProduct.id} Product with ID successfully updated.`,
+        });
+      });
+    })
     .catch((err) => res.status(500).json({ message: `${err}` }));
 };
 
