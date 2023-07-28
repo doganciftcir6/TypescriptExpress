@@ -2,7 +2,7 @@
     //Compiler ayarlarını yapılandıracağız.
     //Çıktı ES5 formatında /dist klasörü altında olacak.
     "compilerOptions": {
-        "target": "ES5",
+        "target": "ES6",
         "module": "CommonJS",
         "outDir": "./dist",
         //uygulamanın tüm dosyaları rootDir de belirtilen konumda olmalı, import export sırasında hata çıkabilir.
@@ -10,6 +10,8 @@
         "strict": true,
         "skipDefaultLibCheck": true,
         "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
     }
 }

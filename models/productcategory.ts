@@ -1,28 +1,16 @@
-import { DataTypes, Model } from "sequelize";
-import sequelize from "../helpers/dbhelpers/connection";
-import IProductCategory from "./interfaces/productcategoryinterface";
+import { Table, Column, Model, ForeignKey, Scopes } from "sequelize-typescript";
+import Product from "./product";
+import Category from "./category";
 
-class ProductCategory extends Model<IProductCategory> implements IProductCategory{
-    id!: number;
-    productId!: number;
-    categoryId!: number;
+@Table
+class ProductCategory extends Model {
+  @ForeignKey(() => Product)
+  @Column
+  productId!: number;
+
+  @ForeignKey(() => Category)
+  @Column
+  categoryId!: number;
 }
-
-ProductCategory.init(
-    {
-        productId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        categoryId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-    },
-    {
-        sequelize,
-        modelName: "ProductCategory",
-    }
-);
 
 export default ProductCategory;

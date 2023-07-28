@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import appUserRoutes from "../routes/appUserRoutes";
 import categoryRoutes from "../routes/categoryRoutes";
 import productRoutes from "../routes/productRoutes";
-import productCategoryRoutes from "../routes/productCategoryRoutes";
 
 //uygulama oluştur
 const app = express();
@@ -34,4 +33,3 @@ app.use(express.json()); //kullanıcının isteğin bodysinden gönderdiği bilg
 app.use("/api/appusers", appUserRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
-app.use("/api/productCategories", productCategoryRoutes);

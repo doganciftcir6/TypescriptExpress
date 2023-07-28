@@ -1,0 +1,10 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "5640",
+    "database": "typescriptexpressdb",
+    "host": "localhost",
+    "dialect": "postgres",
+    "storage": "./database.postgresql"
+  }
+}

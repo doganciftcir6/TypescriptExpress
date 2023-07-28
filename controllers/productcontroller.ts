@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import Product from "../models/product";
+import Category from "../models/category";
 
 //GetAllProduct
 const getAllProducts = async (req: Request, res: Response) => {
-  await Product.findAll()
+  await Product.findAll({ include: [Category] })
     .then((products) => {
       res.status(200).json(products);
     })
@@ -17,7 +18,13 @@ const getProductById = async (req: Request, res: Response) => {
   //id parametreden gelecek
   const { id } = req.params;
 
-  await Product.findByPk(id)
+  await Product.findByPk(id, {
+    include: {
+      model: Category,
+      attributes: ["name", "status"],
+    },
+    attributes: ["id", "name", "price"],
+  })
     .then((product) => {
       if (!product) {
         return res.status(404).json({ message: "Product is not found." });
@@ -32,21 +39,39 @@ const getProductById = async (req: Request, res: Response) => {
 
 //InsertProduct
 const insertProduct = async (req: Request, res: Response) => {
-  const { name, description, price, status } = req.body;
+  const { name, description, price, status, categoryId } = req.body;
 
-  await Product.create({
+  const newProduct = await Product.create({
     name,
     description,
     price,
     status,
   })
     .then((newProduct) => {
-      res.status(200).json({
-        message: `${newProduct.id} Product with ID successfully added.`,
+      // Kategori ID verilmiş mi?
+      if (!categoryId) {
+        return res.status(400).json({ message: "Kategori ID gereklidir." });
+      }
+
+      // Verilen kategori ID ile eşleşen bir kategori var mı?
+      return Category.findByPk(categoryId).then((category) => {
+        if (!category) {
+          return res.status(404).json({ message: "Kategori bulunamadı." });
+        }
+
+        // Eşleşen kategori var ise, yeni ürün ile kategori arasında ilişki oluştur
+        return newProduct.$add("categories", category).then(() => {
+          // İşlem başarılıysa 201 Created cevabı dön
+          return res.status(201).json({ message: "Ürün başarıyla eklendi." });
+        });
       });
     })
-    .catch((err) => {
-      res.status(500).json({ message: `${err}` });
+    .catch((error) => {
+      // Hata durumunda 500 Internal Server Error dön
+      console.error("Hata oluştu:", error);
+      return res
+        .status(500)
+        .json({ message: "İşlem sırasında bir hata oluştu." });
     });
 };
 
@@ -61,11 +86,9 @@ const updateProduct = async (req: Request, res: Response) => {
   //kayıt var update yapılır
   await Product.update(updatedProduct, { where: { id: updatedProduct.id } })
     .then(() =>
-      res
-        .status(200)
-        .json({
-          message: `${updatedProduct.id} Product with ID successfully updated.`,
-        })
+      res.status(200).json({
+        message: `${updatedProduct.id} Product with ID successfully updated.`,
+      })
     )
     .catch((err) => res.status(500).json({ message: `${err}` }));
 };

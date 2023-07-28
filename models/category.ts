@@ -1,28 +1,17 @@
-import { DataTypes, Model } from "sequelize";
-import sequelize from "../helpers/dbhelpers/connection";
-import ICategory from "./interfaces/categoryinterface";
+import { Table, Column, Model, BelongsToMany } from "sequelize-typescript";
+import Product from "./product";
+import ProductCategory from "./productcategory";
 
-class Category extends Model<ICategory> implements ICategory {
-  id!: number;
+@Table
+class Category extends Model {
+  @Column
   name!: string;
+
+  @Column
   status!: boolean;
+
+  @BelongsToMany(() => Product, () => ProductCategory)
+  products!: Product[];
 }
 
-Category.init(
-  {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    status: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: "Category",
-  }
-);
-
-export default Category
+export default Category;

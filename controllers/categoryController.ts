@@ -1,9 +1,15 @@
 import { Request, Response } from "express";
 import Category from "../models/category";
+import Product from "../models/product";
 
 //GetAllCategory
 const getAllCategories = async (req: Request, res: Response) => {
-  await Category.findAll()
+  await Category.findAll({
+    include: {
+      model: Product,
+      attributes: ["name", "status"], //ilgili Category tablosundan sadece 'name' ve 'status' alanlarını al
+    },
+  })
     .then((categories) => {
       res.status(200).json(categories);
     })
@@ -39,11 +45,9 @@ const insertCategory = async (req: Request, res: Response) => {
     status,
   })
     .then((newCategory) => {
-      res
-        .status(200)
-        .json({
-          message: `${newCategory.id} Category with ID successfully added.`,
-        });
+      res.status(200).json({
+        message: `${newCategory.id} Category with ID successfully added.`,
+      });
     })
     .catch((err) => {
       res.status(500).json({ message: `${err}` });
@@ -61,11 +65,9 @@ const updateCatgory = async (req: Request, res: Response) => {
   //kayıt var update yapılır
   await Category.update(updatedCategory, { where: { id: updatedCategory.id } })
     .then(() => {
-      res
-        .status(200)
-        .json({
-          message: `${updatedCategory.id} Category with ID successfully updated.`,
-        });
+      res.status(200).json({
+        message: `${updatedCategory.id} Category with ID successfully updated.`,
+      });
     })
     .catch((err) => res.status(500).json({ message: `${err}` }));
 };
