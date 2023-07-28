@@ -26,10 +26,10 @@ const register = async (req: Request, res: Response) => {
 
     //yeni kullanıcı bilgisini geri döndürebiliriz
     res.status(200).json({ user: newUser });
-  } catch (error) {
+  } catch (err) {
     res
       .status(500)
-      .json({ message: "An error occurred while registering the user." });
+      .json({ message: `${err}` });
   }
 };
 
@@ -51,14 +51,14 @@ const login = async (req: Request, res: Response) => {
     }
 
     //email ve şifre doğru girildi token üret
-    const token = jwt.sign({ userId: user.id }, "expresstypescript", {
+    const token = jwt.sign({ userId: user.id }, "exprestypescript", {
       expiresIn: "1h",
     });
 
     //üretilen token bilgisini geri döndür
     res.status(200).json({ token });
-  } catch (error) {
-    res.status(500).json({ message: "An error occurred while logging in." });
+  } catch (err) {
+    res.status(500).json({ message: `${err}` });
   }
 };
 
