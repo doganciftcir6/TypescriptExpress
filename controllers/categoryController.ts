@@ -74,20 +74,22 @@ const updateCatgory = async (req: Request, res: Response) => {
 
 //DeleteCategory
 const deleteCategory = async (req: Request, res: Response) => {
-  //id parametreden gelecek
   const { id } = req.params;
-  //bu idye sahip kayıt db de var mı kontrol
-  const oldCategory = await Category.findByPk(id);
-  if (!oldCategory) {
-    return res.status(404).json({ message: "Category is not found." });
+
+  //kullanıcının verdiği idye sahip kayıt dbde var mı
+  const category = await Category.findByPk(id);
+  if (!category) {
+    return res.status(404).json({ message: "Ürün bulunamadı." });
   }
-  //kayıt var silme işlemi
+
+  //product ile categori arasındaki ilişkileri kaldır
+  await category.$set("products", []);
+
+  //ilişki kalktı kayıdı sil
   await Category.destroy({ where: { id } })
-    .then(() => {
-      res
-        .status(200)
-        .json({ message: `${id} Category with ID successfully deleted.` });
-    })
+    .then(() =>
+      res.status(200).json({ message: `Category with ID ${id} has been successfully deleted.` })
+    )
     .catch((err) => res.status(500).json({ message: `${err}` }));
 };
 

@@ -97,7 +97,9 @@ const updateProduct = async (req: Request, res: Response) => {
     .then(async () => {
       //kullanıcı update sırasınca categoryId değeri girmeli
       if (!updatedProduct.categoryId) {
-        return res.status(400).json({ message: "Please enter the categoryId." });
+        return res
+          .status(400)
+          .json({ message: "Please enter the categoryId." });
       }
 
       //kullanıcının girdiği categoryId Category tablosunda varmı kontrol
@@ -118,18 +120,21 @@ const updateProduct = async (req: Request, res: Response) => {
 
 //DeleteProduct
 const deleteProduct = async (req: Request, res: Response) => {
-  //id parametreden gelecek
   const { id } = req.params;
-  //bu idye sahip kayıt db de var mı kontrol
-  const oldProduct = await Product.findByPk(id);
-  if (!oldProduct)
+
+  //kullanıcının verdiği idye sahip kayıt dbde var mı
+  const product = await Product.findByPk(id);
+  if (!product) {
     return res.status(404).json({ message: "Product is not found." });
-  //kayıt var silme işlemi
+  }
+
+  //product ile categori arasındaki ilişkileri kaldır
+  await product.$set("categories", []);
+
+  //ilişki kalktı kayıdı sil
   await Product.destroy({ where: { id } })
     .then(() =>
-      res
-        .status(200)
-        .json({ message: `${id} Product with ID successfully deleted.` })
+      res.status(200).json({ message: `Product with ID ${id} has been successfully deleted.`})
     )
     .catch((err) => res.status(500).json({ message: `${err}` }));
 };
