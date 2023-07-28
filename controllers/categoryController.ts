@@ -79,7 +79,7 @@ const deleteCategory = async (req: Request, res: Response) => {
   //kullanıcının verdiği idye sahip kayıt dbde var mı
   const category = await Category.findByPk(id);
   if (!category) {
-    return res.status(404).json({ message: "Ürün bulunamadı." });
+    return res.status(404).json({ message: "Category is not found." });
   }
 
   //product ile categori arasındaki ilişkileri kaldır
