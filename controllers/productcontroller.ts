@@ -46,30 +46,29 @@ const getProductById = async (req: Request, res: Response) => {
 };
 
 //InsertProduct
-const insertProduct = async (req: Request, res: Response) => {
+const insertProduct = (req: Request, res: Response) => {
   const { name, description, price, status, categoryId } = req.body;
 
-  const newProduct = await Product.create({
-    name,
-    description,
-    price,
-    status,
-  })
-    .then((newProduct) => {
-      //categoryid var mı diye kontrol
-      if (!categoryId) {
-        return res
-          .status(400)
-          .json({ message: "Please enter the categoryId." });
+  //kullanıcı categoryid yollamış mı diye kontrol
+  if (!categoryId) {
+    return res.status(400).json({ message: "Please enter the categoryId." });
+  }
+
+  //kullanıcı categoryid yolladıysa bu idye sahip kayıt category tablosunda var mı diye kontrol
+  Category.findByPk(categoryId)
+    .then((category) => {
+      if (!category) {
+        return res.status(404).json({ message: "Category is not found." });
       }
 
-      //girilen categoryid'ye sahip kayıt category tablosunda var mı kontrolü
-      return Category.findByPk(categoryId).then((category) => {
-        if (!category) {
-          return res.status(404).json({ message: "Category is not found." });
-        }
-
-        //kategori dbde var, manytomany ilişki tablosuna bu categoryi ekle.
+      //ilgili categoryid'ye sahip kayıt category tablosunda varmış, product ekleme işlemine geç
+      return Product.create({
+        name,
+        description,
+        price,
+        status,
+      }).then((newProduct) => {
+        //many to many tablosuna ilgili verileri ekleyerek orada bir kayıt oluştur.
         return newProduct.$add("categories", category).then(() => {
           return res.status(200).json({
             message: `${newProduct.id} Product with ID successfully added.`,
@@ -83,36 +82,39 @@ const insertProduct = async (req: Request, res: Response) => {
 };
 
 //UpdateProduct
-const updateProduct = async (req: Request, res: Response) => {
-  //id isteğin bodysinden gelecek
+const updateProduct = (req: Request, res: Response) => {
+  //id isteğin body'sinden gelecek
   const updatedProduct = req.body;
-  //bu id ye sahip kayıt product tablosunda var mı kontrol
-  const oldProduct = await Product.findByPk(updatedProduct.id);
-  if (!oldProduct) {
-    return res.status(404).json({ message: "Product is not found." });
-  }
 
-  //kayıt var update işlemine geç
-  await Product.update(updatedProduct, { where: { id: updatedProduct.id } })
-    .then(async () => {
-      //kullanıcı update sırasınca categoryId değeri girmeli
+  //bu id'ye sahip kayıt product tablosunda var mı kontrol
+  Product.findByPk(updatedProduct.id)
+    .then((oldProduct) => {
+      if (!oldProduct) {
+        return res.status(404).json({ message: "Product is not found." });
+      }
+
+      //kullanıcı güncelleme verilerinde categoryId girmiş mi diye kontrol
       if (!updatedProduct.categoryId) {
-        return res
-          .status(400)
-          .json({ message: "Please enter the categoryId." });
+        return res.status(400).json({ message: "Please enter the categoryId." });
       }
 
-      //kullanıcının girdiği categoryId Category tablosunda varmı kontrol
-      const category = await Category.findByPk(updatedProduct.categoryId);
-      if (!category) {
-        return res.status(404).json({ message: "Category is not found." });
-      }
+      //kullanıcı categoryId girmiş ama bu id'ye sahip kayıt Category tablosunda var mı diye kontrol
+      return Category.findByPk(updatedProduct.categoryId).then((category) => {
+        if (!category) {
+          return res.status(404).json({ message: "Category is not found." });
+        }
 
-      //eğer kayıt varsa many to many tablosunda ilgili category kaydını yenisiyle güncelle
-      return oldProduct.$set("categories", category).then(() => {
-        return res.status(200).json({
-          message: `${updatedProduct.id} Product with ID successfully updated.`,
-        });
+        //kayıt Category tablosunda varmış, product güncelleme işlemine geç
+        return Product.update(updatedProduct, { where: { id: updatedProduct.id } })
+          .then(() => {
+            //many to many tablosunda ilgili yeni verilerle oradaki kayıtı güncelle
+            return oldProduct.$set("categories", category).then(() => {
+              return res.status(200).json({
+                message: `${updatedProduct.id} Product with ID successfully updated.`,
+              });
+            });
+          })
+          .catch((err) => res.status(500).json({ message: `${err}` }));
       });
     })
     .catch((err) => res.status(500).json({ message: `${err}` }));
@@ -134,7 +136,11 @@ const deleteProduct = async (req: Request, res: Response) => {
   //ilişki kalktı kayıdı sil
   await Product.destroy({ where: { id } })
     .then(() =>
-      res.status(200).json({ message: `Product with ID ${id} has been successfully deleted.`})
+      res
+        .status(200)
+        .json({
+          message: `Product with ID ${id} has been successfully deleted.`,
+        })
     )
     .catch((err) => res.status(500).json({ message: `${err}` }));
 };
