@@ -24,7 +24,7 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 
     try {
       //kullanıcının verdiği token kendi tokeni ile uyuyor mu
-      jwt.verify(bearerToken, "exprestypescript");
+      jwt.verify(bearerToken, process.env.SECRET_KEY || "deneme1234567899");
       next();
     } catch (error) {
       res

@@ -51,7 +51,7 @@ const login = async (req: Request, res: Response) => {
     }
 
     //email ve şifre doğru girildi token üret
-    const token = jwt.sign({ user: user }, "exprestypescript", {
+    const token = jwt.sign({ user: user }, process.env.SECRET_KEY || "deneme1234567899", {
       expiresIn: "1h",
     });
 
