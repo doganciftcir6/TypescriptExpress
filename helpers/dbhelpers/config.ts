@@ -17,6 +17,7 @@ interface DbConfig {
     username: string;
     password: string;
     host: string;
+    port: number;
     dialect: "mysql" | "mariadb" | "postgres" | "mssql" | "sqlite" | "oracle";
   };
 }
@@ -27,6 +28,7 @@ const config: DbConfig = {
     username: getEnvVariable("DB_USERNAME"),
     password: getEnvVariable("DB_PASSWORD"),
     host: getEnvVariable("DB_HOST"),
+    port: parseInt(getEnvVariable("DB_PORT")),
     dialect: "postgres",
   },
 };

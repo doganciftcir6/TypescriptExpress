@@ -4,6 +4,7 @@
     "password": "5640",
     "database": "typescriptexpressdb",
     "host": "localhost",
+    "port": "5433",
     "dialect": "postgres",
     "storage": "./database.postgresql"
   }

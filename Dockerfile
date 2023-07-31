@@ -13,7 +13,7 @@ RUN npm install
 COPY . /home/deneme/denemeapp
 
 # Kullanılacak port.
-EXPOSE 4000
+EXPOSE 3000
 
 # Docker çalıştırıldığında çalıştırılacak komut.
 CMD ["npm", "run", "dev"]

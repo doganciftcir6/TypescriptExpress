@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  backend:
+    container_name: app
+    image: expresstypescriptapp
+    command: ["npm", "run", "dev"]
+    build:
+      context: backend
+      dockerfile: ..Dockerfile
+    ports:
+      - "3000:3000"
+    working_dir: /home/deneme/denemeapp
+    environment:
+      DB_DATABASENAME: typescriptexpressdb
+      DB_USERNAME: postgres
+      DB_PASSWORD: 5640
+      DB_HOST: postgres
+
+    volumes:
+      - ./:/home/deneme/denemeapp
+    networks:
+      - express_typescript_network
+      
+  postgres:
+    container_name: postgres
+    image: postgres:15.3-alpine
+    volumes:
+      - database:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 5640
+    networks:
+      - express_typescript_network
+networks:
+  express_typescript_network:
+    external: true
+
+volumes:
+  database:
